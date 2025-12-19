@@ -55,14 +55,20 @@ export class UsersService {
     );
     if (!hasValidFields)
       throw new HttpException(
-        'There must be at leat 1 valid update value (email, password, username)',
+        'There must be at least 1 valid update value (email, password, username)',
         HttpStatus.BAD_REQUEST,
       );
     const user = await this.userRepository.findOneBy({ id });
     if (!user)
-      throw new HttpException('User does not exists', HttpStatus.NOT_FOUND);
+      throw new HttpException('User does not exist', HttpStatus.NOT_FOUND);
     const updates = { ...updateUserDto };
-    if (typeof updateUserDto.password !== 'undefined') {
+    if (updateUserDto.email !== undefined) {
+      const existingEmail = await this.findOne(updateUserDto.email);
+      if (existingEmail) {
+        throw new HttpException('Email already in use', HttpStatus.BAD_REQUEST);
+      }
+    }
+    if (updateUserDto.password !== undefined) {
       const passwordHash = await bcrypt.hash(updateUserDto.password, 10);
       updates.password = passwordHash;
     }
@@ -75,7 +81,7 @@ export class UsersService {
     if (id !== clientUser.sub) throw new UnauthorizedException();
     const deleted = await this.userRepository.delete({ id });
     if (deleted.affected) {
-      return { message: 'User deleted succesfully', status: HttpStatus.OK };
+      return { message: 'User deleted successfully', status: HttpStatus.OK };
     }
   }
 }

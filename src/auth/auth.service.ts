@@ -28,9 +28,9 @@ export class AuthService {
       email: newUser.email,
     };
     const token = await this.jwtService.signAsync(payload, {
-      expiresIn: '12Hrs',
+      expiresIn: '12h',
     });
-    return { message: 'Registered Succesfully', token };
+    return { message: 'Registered successfully', token };
   }
 
   async login(user: { email: string; password: string }) {
@@ -40,7 +40,7 @@ export class AuthService {
       .where('user.email = :email', { email: user.email })
       .getOne();
     if (!userFound)
-      return new HttpException('User does not exists', HttpStatus.NOT_FOUND);
+      throw new HttpException('User does not exist', HttpStatus.NOT_FOUND);
 
     const isMatch = await bcrypt.compare(user.password, userFound.password);
     if (!isMatch) throw new UnauthorizedException('Invalid credentials');
@@ -49,7 +49,9 @@ export class AuthService {
       username: userFound.username,
       email: userFound.email,
     };
-    const token = await this.jwtService.signAsync(payload);
-    return { message: 'User registered succesfully', user: userFound, token };
+    const token = await this.jwtService.signAsync(payload, {
+      expiresIn: '12h',
+    });
+    return { message: 'User logged in successfully', user: userFound, token };
   }
 }

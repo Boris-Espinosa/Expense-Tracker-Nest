@@ -94,8 +94,8 @@ export class ExpensesService {
     updateExpenseDto: UpdateExpenseDto,
     clientUser: ClientUser,
   ) {
-    const hasValidFields = Object.keys(updateExpenseDto).some(
-      (field) => field !== undefined && field !== null && field !== '',
+    const hasValidFields = Object.values(updateExpenseDto).some(
+      (value) => value !== undefined && value !== null && value !== '',
     );
 
     if (!hasValidFields)
@@ -110,7 +110,7 @@ export class ExpensesService {
     const updates = { ...updateExpenseDto };
 
     await this.expensesRepository.update({ id }, { ...updates });
-    return { message: 'Expense updated succesfully' };
+    return { message: 'Expense updated successfully' };
   }
 
   async remove(id: number, clientUser: ClientUser) {
@@ -125,6 +125,6 @@ export class ExpensesService {
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
 
-    return { message: 'expense deleted succesfully' };
+    return { message: 'Expense deleted successfully' };
   }
 }
